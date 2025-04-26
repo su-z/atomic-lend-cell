@@ -1,0 +1,16 @@
+[package]
+name = "atomic-lend-cell"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+# Default to using the flag-based implementation (epoch reclamation approach)
+default = ["flag-based"]
+
+# Reference-counting implementation with atomic counters
+ref-counting = []
+
+# Flag-based implementation with single atomic boolean (epoch reclamation approach)
+flag-based = []
+
+[dependencies]
