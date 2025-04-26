@@ -1,5 +1,7 @@
 # AtomicLendCell
 
+[https://crates.io/crates/atomic-lend-cell]()
+
 A thread-safe Rust container that allows lending references to data across thread boundaries with clear ownership semantics.
 
 ## Why AtomicLendCell?
@@ -11,6 +13,7 @@ Rust's ownership model excels at preventing memory safety issues, but sometimes 
 3. **Unclear ownership intent**: There's no distinction between "owner" and "borrower"
 
 `AtomicLendCell` is designed for scenarios where:
+
 - You have a clear primary owner of some data
 - You know the owner will outlive all borrows
 - You need to share references across threads or non-lexical scopes
@@ -41,19 +44,19 @@ use std::thread;
 fn main() {
     // Create a cell with some data
     let cell = AtomicLendCell::new(vec![1, 2, 3, 4, 5]);
-    
+  
     // Borrow the data
     let borrow = cell.borrow();
-    
+  
     // Use the borrow in another thread
     let handle = thread::spawn(move || {
         // Access the data through the borrow
         println!("Data in thread: {:?}", *borrow);
     });
-    
+  
     // Meanwhile, the original thread can still access the data
     println!("Original data: {:?}", *cell);
-    
+  
     // Wait for the thread to complete
     handle.join().unwrap();
 }
@@ -71,6 +74,7 @@ atomic-lend-cell = { version = "0.1.0", default-features = false, features = ["r
 ```
 
 This implementation:
+
 - Tracks exact reference counts
 - Provides stronger safety guarantees
 - Has higher performance overhead due to atomic operations on each borrow/drop
@@ -83,6 +87,7 @@ atomic-lend-cell = "0.1.0"  # Uses flag-based by default
 ```
 
 This implementation:
+
 - Uses a single atomic flag instead of reference counting
 - Has less overhead for borrowing operations
 - Relies more heavily on correct usage patterns
@@ -104,10 +109,10 @@ In debug builds, violations of the borrowing contract will cause panics to catch
 Both implementations will panic if the `AtomicLendCell` is dropped while active borrowers exist, however:
 
 - **Reference counting implementation**: Will reliably panic as soon as the owner is dropped with active borrows, providing strong safety guarantees.
-
 - **Flag-based implementation**: The panic is based on checking an atomic flag during specific operations. In rare cases with concurrent access across threads, a segmentation fault might occur before the panic is triggered, particularly in release builds or high-concurrency scenarios.
 
 If your application requires absolute memory safety guarantees, consider:
+
 1. Using the reference counting implementation (`ref-counting` feature)
 2. Adding additional synchronization to ensure all borrows complete before dropping the owner
 3. Using standard library alternatives like `Arc<T>` when appropriate
@@ -117,6 +122,7 @@ The flag-based implementation (default) prioritizes performance at the cost of s
 ## When to Use
 
 `AtomicLendCell` is ideal for:
+
 - Service objects that need to lend data to worker threads
 - Long-lived objects created at program start that need to be accessed from multiple threads
 - Data pipelines where ownership is clear but standard borrowing is too restrictive
@@ -125,6 +131,7 @@ The flag-based implementation (default) prioritizes performance at the cost of s
 ## When Not to Use
 
 Consider alternatives when:
+
 - You need mutable access (consider `RwLock` or `Mutex`)
 - Ownership is truly shared (use `Arc`)
 - The borrowing relationship isn't clearly defined
