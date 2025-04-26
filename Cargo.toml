@@ -2,6 +2,9 @@
 name = "atomic-lend-cell"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+description = "A Rust library for lending immutable references across threads with explicit owner-borrower semantics, offering both atomic reference counting and lightweight flag-based implementations."
+repository = "https://github.com/su-z/atomic-lend-cell.git"
 
 [features]
 # Default to using the flag-based implementation (epoch reclamation approach)
